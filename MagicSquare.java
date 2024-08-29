@@ -1,12 +1,17 @@
 
 
 
+import java.io.File;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
 
 public class MagicSquare implements MagicSquareInterface {
 
     private int[][] Matrix;
 
-
+    /*
+     * Creates MagicSquare one integer.
+     */
     public MagicSquare(int n) {
         
         
@@ -14,6 +19,31 @@ public class MagicSquare implements MagicSquareInterface {
         for (int r = 0;r < n;r++) {           //loop goes to each individual location in the grid 
             for (int c=0;c<n; c++) {
             }
+        }
+    }
+
+    
+    /*
+     * Creates MagicSquare using one file param.
+     */
+    public MagicSquare(String fileName) {
+        try {
+            File file = new File(fileName);
+            Scanner docScanner = new Scanner(file);
+            int n = Integer.parseInt(docScanner.next());
+            Matrix = new int[n][n];
+            Scanner lineScanner;
+
+            //reads each integer into it's spot in  the matrix
+            for (int r = 0;r < n;r++) {           
+                String line = docScanner.next();
+                lineScanner = new Scanner(line);
+                for (int c = 0;c < n; c++) {
+                    Matrix[r][c] = lineScanner.nextInt();
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found.");
         }
     }
 
@@ -62,12 +92,15 @@ public class MagicSquare implements MagicSquareInterface {
             }
             magicString += "\n";
         }
-        if () {
-
+        if (this.isMagicSquare()) {
+            magicString += " is a magic square.\n";
         }
         else{
-            
+            magicString += " is not a magic square.\n";
         }
 
+        return magicString;
 
+
+    }
 }
