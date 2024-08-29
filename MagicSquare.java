@@ -79,9 +79,37 @@ public class MagicSquare implements MagicSquareInterface {
      * Creates MagicSquare f one integer.
      */
     public MagicSquare(int n) {
-        
-        
         Matrix = new int[n][n];
+
+        int row = n - 1;
+        int col = n / 2;
+        int oldRow;
+        int oldCol;
+
+        for (int i=1; i < n*n + 1; i++) {
+            Matrix[row][col] = i;
+            oldRow = row;
+            oldCol = col;
+            row++;
+            col++;
+
+            if (row == n) {
+                row = 0;
+            }
+            if (col == n) {
+                col = 0;
+            }
+
+            if (Matrix[row][col]>0) {
+                row = oldRow; 
+                col = oldCol;
+                row--;
+            }
+
+
+        }
+
+        
         
     }
     
