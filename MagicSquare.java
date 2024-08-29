@@ -4,6 +4,11 @@
 import java.io.File;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 public class MagicSquare implements MagicSquareInterface {
 
@@ -75,42 +80,70 @@ public class MagicSquare implements MagicSquareInterface {
         return hasMagicPattern;
     }
 
+    private void writeMatrix(int[][] matrix, String filename) throws IOException {
+        
+        try {
+            FileWriter fileWriter = new FileWriter(filename, true);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            printWriter.println(matrix.length);
+            for (int r=0; r<matrix.length; r++) {
+                for (int c=0; c<matrix.length; c++) {
+                    printWriter.print(matrix[r][c]+" ");
+                }
+                printWriter.println();
+            }
+            
+            printWriter.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+    
+        
+    }
+
     /*
      * Creates MagicSquare f one integer.
      */
     public MagicSquare(int n) {
         Matrix = new int[n][n];
 
-        int row = n - 1;
-        int col = n / 2;
-        int oldRow;
-        int oldCol;
 
-        for (int i=1; i < n*n + 1; i++) {
-            Matrix[row][col] = i;
-            oldRow = row;
-            oldCol = col;
-            row++;
-            col++;
+        //int col = n / 2;
+        //int row = n - 1;
+        //int oldRow;
+        //int oldCol;
 
-            if (row == n) {
-                row = 0;
-            }
-            if (col == n) {
-                col = 0;
-            }
+        //for (int i=1; i < n*n + 1; i++) {
+        //    Matrix[row][col] = i;
+        //    oldRow = row;
+        //    oldCol = col;
+        //    row++;
+        //    col++;
+//
+        //    if (row == n) {
+        //        row = 0;
+        //    }
+        //    if (col == n) {
+        //        col = 0;
+        //    }
+//
+        //    if (Matrix[row][col]>0) {
+        //        row = oldRow; 
+        //        col = oldCol;
+        //        row--;
+        //    }
 
-            if (Matrix[row][col]>0) {
-                row = oldRow; 
-                col = oldCol;
-                row--;
-            }
 
+    //    }
 
-        }
-
+    
         
-        
+
+
+
     }
     
 
@@ -118,17 +151,17 @@ public class MagicSquare implements MagicSquareInterface {
     /*
      * Creates MagicSquare using one file param.
      */
-    public MagicSquare(String fileName) {
+    public MagicSquare(String fileName) throws IOException {
         try {
             File file = new File(fileName);
             Scanner docScanner = new Scanner(file);
-            int n = Integer.parseInt(docScanner.next());
+            int n = Integer.parseInt(docScanner.nextLine());
             Matrix = new int[n][n];
             Scanner lineScanner;
 
             //reads each integer into it's spot in  the matrix
             for (int r = 0;r < n;r++) {           
-                String line = docScanner.next();
+                String line = docScanner.nextLine();
                 lineScanner = new Scanner(line);
                 for (int c = 0;c < n; c++) {
                     Matrix[r][c] = lineScanner.nextInt();
@@ -137,6 +170,33 @@ public class MagicSquare implements MagicSquareInterface {
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
         }
+
+        writeMatrix(Matrix, "MagicSquare.txt");
+        
+    }
+
+    public MagicSquare(String filename, int dimension) throws IOException {
+        try {
+            File file = new File(filename);
+            Scanner docScanner = new Scanner(file);
+            int n = dimension;
+            Matrix = new int[n][n];
+            Scanner lineScanner;
+
+            //reads each integer into it's spot in  the matrix
+            for (int r = 0;r < n;r++) {           
+                String line = docScanner.nextLine();
+                lineScanner = new Scanner(line);
+                for (int c = 0;c < n; c++) {
+                    Matrix[r][c] = lineScanner.nextInt();
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found.");
+        }
+
+        writeMatrix(Matrix, "MagicSquare.txt");
+        
     }
 
 
