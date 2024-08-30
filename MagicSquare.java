@@ -2,248 +2,159 @@
 
 
 import java.io.File;
-import java.util.Scanner;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.util.Scanner;
 
 public class MagicSquare implements MagicSquareInterface {
-
-    private int[][] Matrix;
+    private int[][] matrix;
+    private boolean isMagicSquare;
     
-    
-    /*
-     * helping functions for magic square calculation
-     */
-    private boolean containsAllNumbers() {
-        
-        boolean containsAllNumbers = true;
-        int[] containedNums = new int[Matrix.length*Matrix.length];
 
-        for (int r = 0;r < Matrix.length;r++) {           //loop goes to each individual location in the grid 
-            for (int c=0;c<Matrix.length; c++) {
-                int checkingNum = Matrix[r][c];
-                
-                containedNums[checkingNum-1] = checkingNum; //adds each number in the array from the matrix into the array in order
-                
-            }
-        }
-
-        for (int i=0;i<containedNums.length;i++) {
-            if (containedNums[i] != i+1) {
-                containsAllNumbers = false; //checks that all numbers are included
-            }
-        }
-
-       return containsAllNumbers;
+    // Constructor to read the matrix from a file
+    public MagicSquare(String filename) throws FileNotFoundException {
+        this.matrix = readMatrix(filename);
+        this.isMagicSquare = checkIfMagicSquare();
     }
 
-    private boolean hasMagicPattern() {
-        int magicNumber = Matrix.length * (Matrix.length*Matrix.length + 1) / 2;
-        boolean hasMagicPattern = true;
-
-        for (int r = 0;r < Matrix.length;r++) {           //checks row sums
-            int rowSum = 0;
-            for (int c=0;c<Matrix.length; c++) {
-                rowSum += Matrix[r][c];
-            }
-            if (rowSum != magicNumber) {
-                hasMagicPattern = false;
-            }
-
-        }        
-
-        for (int c = 0;c < Matrix.length;c++) {           //checks col sums
-            int colSum = 0;
-            for (int r=0;r<Matrix.length; r++) {
-                colSum += Matrix[r][c];
-            }
-            if (colSum != magicNumber) {
-                hasMagicPattern = false;
-            }
-
-        }   
-        
-        int diag1sum = 0;
-        int diag2sum = 0;
-        for (int i=0;i < Matrix.length;i++) {    // collects diagonal sums
-            diag1sum += Matrix[i][i];
-            diag2sum += Matrix[i][Matrix.length-i];
-        }
-        if ((diag1sum != magicNumber) || (diag2sum != magicNumber)) {   //checks diagonal sums
-            hasMagicPattern = false;
-        }
-
-        return hasMagicPattern;
-    }
-
-    private void writeMatrix(int[][] matrix, String filename) throws IOException {
-        
-        try {
-            FileWriter fileWriter = new FileWriter(filename, true);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
-
-            printWriter.println(matrix.length);
-            for (int r=0; r<matrix.length; r++) {
-                for (int c=0; c<matrix.length; c++) {
-                    printWriter.print(matrix[r][c]+" ");
-                }
-                printWriter.println();
-            }
-            
-            printWriter.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    
-    
-        
-    }
-
-    /*
-     * Creates MagicSquare f one integer.
-     */
-    public MagicSquare(int n) {
-        Matrix = new int[n][n];
-
-
-        //int col = n / 2;
-        //int row = n - 1;
-        //int oldRow;
-        //int oldCol;
-
-        //for (int i=1; i < n*n + 1; i++) {
-        //    Matrix[row][col] = i;
-        //    oldRow = row;
-        //    oldCol = col;
-        //    row++;
-        //    col++;
-//
-        //    if (row == n) {
-        //        row = 0;
-        //    }
-        //    if (col == n) {
-        //        col = 0;
-        //    }
-//
-        //    if (Matrix[row][col]>0) {
-        //        row = oldRow; 
-        //        col = oldCol;
-        //        row--;
-        //    }
-
-
-    //    }
-
-    
-        
-
-
-
-    }
-    
-
-    
-    /*
-     * Creates MagicSquare using one file param.
-     */
-    public MagicSquare(String fileName) throws IOException {
-        try {
-            File file = new File(fileName);
-            Scanner docScanner = new Scanner(file);
-            int n = Integer.parseInt(docScanner.nextLine());
-            Matrix = new int[n][n];
-            Scanner lineScanner;
-
-            //reads each integer into it's spot in  the matrix
-            for (int r = 0;r < n;r++) {           
-                String line = docScanner.nextLine();
-                lineScanner = new Scanner(line);
-                for (int c = 0;c < n; c++) {
-                    Matrix[r][c] = lineScanner.nextInt();
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
-        }
-
-        writeMatrix(Matrix, "MagicSquare.txt");
-        
-    }
-
+    // Constructor to generate a new magic square and write it to a file
     public MagicSquare(String filename, int dimension) throws IOException {
-        try {
-            File file = new File(filename);
-            Scanner docScanner = new Scanner(file);
-            int n = dimension;
-            Matrix = new int[n][n];
-            Scanner lineScanner;
-
-            //reads each integer into it's spot in  the matrix
-            for (int r = 0;r < n;r++) {           
-                String line = docScanner.nextLine();
-                lineScanner = new Scanner(line);
-                for (int c = 0;c < n; c++) {
-                    Matrix[r][c] = lineScanner.nextInt();
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
+        if (dimension % 2 == 0) {
+            System.out.println("invalid input.");
         }
-
-        writeMatrix(Matrix, "MagicSquare.txt");
-        
+        this.matrix = generateMagicSquare(dimension);
+        writeMatrix(this.matrix, filename);
+        this.isMagicSquare = true;
     }
 
+    // Private method to read the matrix from a file
+    private int[][] readMatrix(String filename) throws FileNotFoundException {
+        File file = new File(filename);
+        Scanner documentScanner = new Scanner(file);  // Scanner for the entire file
+    
+        int size = Integer.parseInt(documentScanner.nextLine().trim());  // Read the matrix size from the first line
+        int[][] matrix = new int[size][size];
+    
+        for (int row = 0; row < size; row++) {
+            String line = documentScanner.nextLine();  // Read each line of the matrix
+            Scanner lineScanner = new Scanner(line);  // Scanner for individual line
+    
+            for (int col = 0; col < size; col++) {
+                if (lineScanner.hasNext()) {
+                    matrix[row][col] = Integer.parseInt(lineScanner.next().trim());  // Parse each integer
+                }
+            }
+            lineScanner.close();
+        }
+    
+        documentScanner.close();
+        return matrix;
+    }
+    
 
+    // Private method to generate a magic square
+    private int[][] generateMagicSquare(int size) {
+        int[][] matrix = new int[size][size];
+        int row = size - 1;
+        int col = size / 2;
+        for (int i = 1; i <= size * size; i++) {
+            matrix[row][col] = i;
+            int newRow = (row + 1) % size;
+            int newCol = (col + 1) % size;
+            if (matrix[newRow][newCol] != 0) {
+                row = (row - 1 + size) % size;
+            } else {
+                row = newRow;
+                col = newCol;
+            }
+        }
+        return matrix;
+    }
+
+    // Private method to write the matrix to a file
+    private void writeMatrix(int[][] matrix, String filename) throws IOException {
+        PrintWriter outFile = new PrintWriter(new FileWriter(filename));
+        outFile.println(matrix.length);
+        for (int[] row : matrix) {
+            for (int num : row) {
+                outFile.print(num + " ");
+            }
+            outFile.println();
+        }
+        outFile.close();
+    }
+
+    // Method to check if the matrix is a magic square
     @Override
     public boolean isMagicSquare() {
-        if (containsAllNumbers() && hasMagicPattern()) {
+        return isMagicSquare;
+    }
+
+    // Method to return a copy of the matrix
+    @Override
+    public int[][] getMatrix() {
+        int[][] copy = new int[matrix.length][matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(matrix[i], 0, copy[i], 0, matrix[i].length);
+        }
+        return copy;
+    }
+
+    // Method to check if the current matrix is a magic square
+    private boolean checkIfMagicSquare() {
+        int n = matrix.length;
+        int magicSum = n * (n*n + 1) / 2;
+
+        // Check rows and columns
+        for (int i = 0; i < n; i++) {
+            int rowSum = 0;
+            int colSum = 0;
+            for (int j = 0; j < n; j++) {
+                rowSum += matrix[i][j];
+                colSum += matrix[j][i];
+            }
+            if (rowSum != magicSum || colSum != magicSum) {
+                return false;
+            }
+        }
+
+        // Check diagonals
+        int diag1Sum = 0, diag2Sum = 0;
+        for (int i = 0; i < n; i++) {
+            diag1Sum += matrix[i][i];
+            diag2Sum += matrix[i][n - i - 1];
+        }
+        
+        if (diag1Sum == magicSum && diag2Sum == magicSum) {
             return true;
         }
         else {
             return false;
         }
-    }
-
-
-    @Override
-    public int[][] getMatrix() {
-        int[][] copyMatrix = new int[Matrix.length][Matrix.length]; // creates a copy of the matrix with the right dimensions
         
-        for (int r = 0;r < Matrix.length;r++) {           //loop goes to each individual location in the grid 
-            for (int c=0;c<Matrix.length; c++) {
-                copyMatrix[r][c] = Matrix[r][c];
-            }
-        }
-        
-        return copyMatrix;
-
     }
 
+    // Method to return the formatted string representation of the matrix
     @Override
-	public String toString() {
-        String magicString = " The matrix\n";
-        for (int r = 0;r < Matrix.length;r++) {  
-            magicString += "   ";
-            for (int c=0;c<Matrix.length; c++) {
-                magicString += Matrix[r][c];
+
+    public String toString() {
+        String result = "The matrix\n";
+        for (int[] row : matrix) {
+            for (int num : row) {
+                result += num + " ";
             }
-            magicString += "\n";
+            result += "\n";
         }
-        if (this.isMagicSquare()) {
-            magicString += " is a magic square.\n";
+        if (isMagicSquare()) {
+            result += "is a magic square.";
+        } else {
+            result += "is not a magic square.";
         }
-        else{
-            magicString += " is not a magic square.\n";
-        }
-
-        return magicString;
-
-
+        return result;
     }
+    
+    
+
 }
